@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\GameController;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,6 +14,11 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// Initial index view
+Route::view('/', 'index');
+
+// Game start view
+Route::get('/start', [GameController::class, 'startGame'])->name('trivia.start');
+
+// Handle question fetching
+Route::get('/question', [GameController::class, 'fetchQuestion'])->name('trivia.question');

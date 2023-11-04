@@ -3,17 +3,40 @@
 declare (strict_types=1);
 namespace App\Services;
 
+use App\Services\GameSessionService;
+
 /**
  * GameService
+ * 
+ * Handles most of the Trivia game business logic
  */
-class GameService {    
+class GameService 
+{    
+    /**
+     * __construct
+     *
+     * @return void
+     */
+    public function __construct(
+        protected GameSessionService $gameSessionService
+    ) {}
+
     /**
      * startGame
+     * 
+     * Instantiates the Session manager to create required
+     * session variables.
      *
      * @return void
      */
     public function startGame()
     {
-        // Start Game logic
+        // Set session variables
+        $this->gameSessionService->startGame();
+    }
+
+    public function checkSessionData()
+    {
+        return $this->gameSessionService->checkSessionData();
     }
 }

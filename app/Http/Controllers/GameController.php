@@ -51,10 +51,7 @@ class GameController extends Controller
             return view('index');
         }
 
-        var_dump($questionData);
-        // Logic for fetching the question data
-
         // Procceed to the game question
-        return view('trivia.question');   
+        return view('trivia.question', compact('questionData'));
     }
 }

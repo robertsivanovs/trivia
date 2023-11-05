@@ -55,7 +55,7 @@ class GameService
      *
      * @return void
      */
-    public function fetchQuestionData(): array|bool
+    public function fetchQuestionData() //: array|bool
     {
         return $this->questionService->fetchQuestionData();
     }

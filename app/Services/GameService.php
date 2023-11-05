@@ -4,6 +4,7 @@ declare (strict_types=1);
 namespace App\Services;
 
 use App\Services\GameSessionService;
+use App\Services\QuestionService;
 
 /**
  * GameService
@@ -18,7 +19,8 @@ class GameService
      * @return void
      */
     public function __construct(
-        protected GameSessionService $gameSessionService
+        protected GameSessionService $gameSessionService,
+        protected QuestionService $questionService
     ) {}
 
     /**
@@ -29,14 +31,33 @@ class GameService
      *
      * @return void
      */
-    public function startGame()
+    public function startGame(): void
     {
         // Set session variables
         $this->gameSessionService->startGame();
     }
-
-    public function checkSessionData()
+    
+    /**
+     * checkSessionData
+     * 
+     * Check if the user session contains required variables
+     *
+     * @return bool
+     */
+    public function checkSessionData(): bool
     {
         return $this->gameSessionService->checkSessionData();
     }
+    
+    
+    /**
+     * fetchQuestionData
+     *
+     * @return void
+     */
+    public function fetchQuestionData(): array|bool
+    {
+        return $this->questionService->fetchQuestionData();
+    }
+
 }

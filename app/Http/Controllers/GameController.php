@@ -4,7 +4,6 @@ declare (strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Services\GameService;
-use Illuminate\Http\Request;
 
 /**
  * GameController
@@ -45,6 +44,14 @@ class GameController extends Controller
             return view('index');
         }
 
+        $questionData = $this->gameService->fetchQuestionData();
+
+        if (!$questionData) {
+            // TO DO: add error logging
+            return view('index');
+        }
+
+        var_dump($questionData);
         // Logic for fetching the question data
 
         // Procceed to the game question

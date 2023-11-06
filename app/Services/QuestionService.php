@@ -3,8 +3,9 @@
 declare(strict_types=1);
 namespace App\Services;
 
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
+use App\Models\Question;
+use App\Contracts\ValidatorServiceInterface;
+use App\Contracts\DataFetcherServiceInterface;
 
 /**
  * QuestionService
@@ -13,51 +14,69 @@ use Illuminate\Support\Facades\Log;
  */
 class QuestionService
 {
+    public function __construct(
+        protected ValidatorServiceInterface $validatorServiceInterface,
+        protected DataFetcherServiceInterface $dataFetcherServiceInterface
+    ) {}
+
     /**
      * fetchQuestionData
      * 
-     * Fetch the question data from the numbersapi API endpoint.
+     * Manage the operations needed to create the question for the game
      *
-     * @return json|bool
+     * @return Question|bool
      */
-    public function fetchQuestionData(): array|bool
+    public function fetchQuestionData(): Question|bool
     {
-        try {
-            $response = Http::get(config('api.trivia.endpoint'));
-        } catch (\Exception $e) {
-            Log::error('API request failed: ' . $e->getMessage());
+        // Fetch the data from numbersapi
+        $response = $this->dataFetcherServiceInterface->fetchApiData();
+
+        if (!$response) {
             return false;
         }
 
-        if (!$this->validateResponse($response)) {
+        // Instantiate the validator class
+        if (!$this->validatorServiceInterface->validate($response)) {
             return false;
         }
 
-        return $response->json();
+        $questionData = $response->json();
+
+        // Extract the text, number, and answer options
+        $text = $questionData['text'];
+        $correctAnswer = $questionData['number'];
+
+        // Generate the answers for the question
+        $answers = $this->generateRandomAnswers($correctAnswer);
+
+        // Return the question data
+        return new Question($text, $correctAnswer, $answers);
+
     }
-
+    
     /**
-     * validateResponse
+     * generateRandomAnswers
      * 
-     * Validate the response received from the numbersapi API endpoint.
+     * Generates a random amount if addiitonal answers for the game
+     * 1-3 additional answers
      *
-     * @param \Illuminate\Http\Client\Response $response
-     * @return bool
+     * @param int|float $correctAnswer
+     * @return array
      */
-    private function validateResponse(\Illuminate\Http\Client\Response $response): bool
+    private function generateRandomAnswers(int|float $correctAnswer): array
     {
-        if (!$response->successful()) {
-            Log::error('API request failed with status code: ' . $response->status());
-            return false;
+        $answerOptions = [$correctAnswer];
+        // Randomize how many incorrect answers to generate min 1 max 3
+        $answerCount = rand(1, 3);
+
+        // Generate random numbers as incorrect answers
+        for ($i = 0; $i < $answerCount; $i++) {
+            $answerOptions[] = rand();
         }
 
-        $responseData = $response->json();
+        // Shuffle answer order
+        shuffle($answerOptions);
 
-        if (!$responseData['found'] || $responseData['type'] !== 'trivia') {
-            Log::error('Invalid response data');
-            return false;
-        }
-
-        return true;
+        return $answerOptions;
     }
 }

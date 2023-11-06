@@ -39,8 +39,9 @@ class GameController extends Controller
      */
     public function fetchQuestion()
     {
-        // Session variables are not set
-        if (!$this->gameService->checkSessionData()) {
+        $questionNumber = $this->gameService->getCurrentQuestionNumber();
+        // If session variables are not set
+        if ($questionNumber < 1) {
             // TO DO: add error logging
             return view('index');
         }
@@ -48,7 +49,7 @@ class GameController extends Controller
         // Check if the current question is in the session
         $questionData = $this->gameService->fetchQuestionFromSession();
 
-        // Do not fetch a new question untill the current one is answered correctly
+        // Do not fetch a new question untill the current one is answered
         if (!empty($questionData)) {
             // Procceed to the game question
             return view('trivia.question', compact('questionData'));
@@ -62,6 +63,8 @@ class GameController extends Controller
             return view('index');
         }
 
+        // Add current question count to question
+        $questionData->currentQuestion = $questionNumber;
         // Store the current question in the session
         $this->gameService->storeQuestionInSession($questionData);
 
@@ -71,31 +74,31 @@ class GameController extends Controller
 
     public function checkAnswer(AnswerValidationRequest $answerValidationRequest)
     {
-        if (!$answerValidationRequest->isMethod('post')) {
-            return view('index');
-        }
-
         // Validate user input
         $validateData = $answerValidationRequest->validated();
+
         // If data was not validated
         if (!$validateData) {
             return view('index');
         }
 
         // Gather user POST data & Question data
-        $userAnswer = $answerValidationRequest->input('answer');
+        $userAnswer = $validateData['answer'];
         $questionData = $this->gameService->fetchQuestionFromSession();
 
-        // If the answer is not correct
-        if ($userAnswer != $questionData->correctAnswer) {
-            // To Do: Add data for the unanswered question
-            var_dump("Game over");
-            die();
+        // Delete the answered question from session
+        $this->gameService->deleteQuestionFromSession();
+
+        // Check if the answer was correct or not
+        $answerCorrect = $this->gameService->checkAnswer($userAnswer, $questionData->correctAnswer);
+
+        // If the answer was not correct
+        if (!$answerCorrect) {
+            return view('trivia.gameOver', compact('questionData', 'userAnswer'));
         }
 
-        // Uer answered the question correctly
-        $this->gameService->deleteQuestionFromSession();
-        // Proceed to the next question
+        // Increment the question number and proceed to the next question
+        $this->gameService->incrementCurrentQuestion();
         return $this->fetchQuestion();
 
     }

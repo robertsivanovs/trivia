@@ -4,6 +4,7 @@ declare (strict_types=1);
 namespace App\Services;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 /**
  * GameSessionService
@@ -30,19 +31,19 @@ class GameSessionService
      */
     public function startGame()
     {
-        $this->request->session()->put('score', 0);
         $this->request->session()->put('current_question', 1);
     }
-
-    public function checkSessionData()
+    
+    /**
+     * getCurrentQuestionNumber
+     * 
+     * Gets the current question count from the session
+     *
+     * @return int
+     */
+    public function getCurrentQuestionNumber(): int
     {
-        // return $data = [
-        //     $this->request->session()->get('score'),
-        //     $this->request->session()->get('current_question'),
-        // ];
-
-        return ($this->request->session()->has('score') 
-            && $this->request->session()->has('current_question'));
+        return $this->request->session()->get('current_question') ?? 0;
     }
     
     /**
@@ -50,7 +51,7 @@ class GameSessionService
      * 
      * Set the question data in the current session
      *
-     * @param  mixed $question
+     * @param \App\Models\Question $question
      * @return void
      */
     public function storeQuestionInSession(\App\Models\Question $question): void
@@ -63,11 +64,16 @@ class GameSessionService
      * 
      * Get the question data from the current session
      *
-     * @return App\Models\Question
+     * @return App\Models\Question|null
      */
-    public function fetchQuestionFromSession(): \App\Models\Question|null
+    public function fetchQuestionFromSession(): ?\App\Models\Question
     {
-        return $this->request->session()->get('question_data');
+        try {
+            return $this->request->session()->get('question_data');
+        } catch (\Exception $e) {
+            Log::error('Error in fetchQuestionFromSession: ' . $e->getMessage());
+            return null;
+        }
     }
     
     /**
@@ -81,4 +87,42 @@ class GameSessionService
     {
         $this->request->session()->forget('question_data');
     }
+    
+    /**
+     * incrementCurrentQuestion
+     * 
+     * Increase current question count by 1
+     * Used when the user answers correctly to the question
+     *
+     * @return void
+     */
+    public function incrementCurrentQuestion(): void
+    {
+        try {
+            $questionCount = $this->request->session()->get('current_question');
+            $questionCount++;
+            $this->request->session()->put('current_question', $questionCount);
+        } catch (\Exception $e) {
+            Log::error('Error in incrementCurrentQuestion: ' . $e->getMessage());
+        }
+    }
+    
+    /**
+     * deleteSessionData
+     * 
+     * Deletes all Quiz session data
+     *
+     * @return void
+     * @throws Exception
+     */
+    public function deleteSessionData(): void
+    {
+        try {
+            $this->request->session()->flush();
+        } catch (\Exception $e) {
+            // Log an error
+            Log::error('Error in deleteSessionData: ' . $e->getMessage());
+        }
+    }
+
 }

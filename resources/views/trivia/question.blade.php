@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <h3>Question Nr:. X</h3>
+    <h3>Question Nr:. {{ $questionData->currentQuestion }}</h3>
     <h2>{{ $questionData->text }}</h2>
     <form action="/answer" method="post">
         @csrf

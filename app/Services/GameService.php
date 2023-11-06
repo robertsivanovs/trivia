@@ -5,6 +5,7 @@ namespace App\Services;
 
 use App\Services\GameSessionService;
 use App\Services\QuestionService;
+use App\Services\AnswerService;
 
 /**
  * GameService
@@ -20,7 +21,8 @@ class GameService
      */
     public function __construct(
         protected GameSessionService $gameSessionService,
-        protected QuestionService $questionService
+        protected QuestionService $questionService,
+        protected AnswerService $answerService
     ) {}
 
     /**
@@ -44,9 +46,14 @@ class GameService
      *
      * @return bool
      */
-    public function checkSessionData(): bool
+    public function getCurrentQuestionNumber(): int
     {
-        return $this->gameSessionService->checkSessionData();
+        return $this->gameSessionService->getCurrentQuestionNumber();
+    }
+
+    public function incrementCurrentQuestion(): void
+    {
+        $this->gameSessionService->incrementCurrentQuestion();
     }
     
     /**
@@ -94,6 +101,18 @@ class GameService
     public function deleteQuestionFromSession(): void
     {
         $this->gameSessionService->deleteQuestionFromSession();
+    }
+    
+    /**
+     * checkAnswer
+     *
+     * @param  mixed $userAnswer
+     * @param  mixed $correctAnswer
+     * @return void
+     */
+    public function checkAnswer(string $userAnswer, string $correctAnswer)
+    {
+        return $this->answerService->checkAnswer($userAnswer, $correctAnswer);
     }
 
 }

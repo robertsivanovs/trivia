@@ -20,7 +20,7 @@ class Question extends Model
      */
     public function __construct(
         public string       $text, 
-        public int|float    $correctAnswer, 
+        public string       $correctAnswer, 
         public array        $answers
     ) {}
 }

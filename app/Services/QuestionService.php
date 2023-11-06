@@ -44,13 +44,17 @@ class QuestionService
 
         // Extract the text, number, and answer options
         $text = $questionData['text'];
-        $correctAnswer = $questionData['number'];
+        $correctAnswer = (string)$questionData['number'];
 
         // Generate the answers for the question
         $answers = $this->generateRandomAnswers($correctAnswer);
 
         // Return the question data
-        return new Question($text, $correctAnswer, $answers);
+        return new Question(
+            $text, 
+            $correctAnswer, 
+            $answers
+        );
 
     }
     
@@ -63,7 +67,7 @@ class QuestionService
      * @param int|float $correctAnswer
      * @return array
      */
-    private function generateRandomAnswers(int|float $correctAnswer): array
+    private function generateRandomAnswers(string $correctAnswer): array
     {
         $answerOptions = [$correctAnswer];
         // Randomize how many incorrect answers to generate min 1 max 3

@@ -10,7 +10,11 @@ use App\Services\AnswerService;
 /**
  * GameService
  * 
- * Handles most of the Trivia game business logic
+ * @author Roberts Ivanovs
+ * 
+ * Layer between the main game controller and all Service classes
+ * Instantiates other Services that are responsible for the business logic.
+ * 
  */
 class GameService 
 {    
@@ -42,7 +46,7 @@ class GameService
     /**
      * checkSessionData
      * 
-     * Check if the user session contains required variables
+     * Returns the current question count
      *
      * @return bool
      */
@@ -50,7 +54,15 @@ class GameService
     {
         return $this->gameSessionService->getCurrentQuestionNumber();
     }
-
+    
+    /**
+     * incrementCurrentQuestion
+     * 
+     * Increase the current question by 1
+     * Happens when user answers correctly to the question
+     *
+     * @return void
+     */
     public function incrementCurrentQuestion(): void
     {
         $this->gameSessionService->incrementCurrentQuestion();
@@ -58,6 +70,8 @@ class GameService
     
     /**
      * fetchQuestionData
+     * 
+     * Return the data needed for displaying the question
      *
      * @return array|bool
      */
@@ -104,13 +118,27 @@ class GameService
     }
     
     /**
-     * checkAnswer
+     * deleteSessionData
+     * 
+     * Completely deletes all current session data
      *
-     * @param  mixed $userAnswer
-     * @param  mixed $correctAnswer
      * @return void
      */
-    public function checkAnswer(string $userAnswer, string $correctAnswer)
+    public function deleteSessionData(): void
+    {
+        $this->gameSessionService->deleteSessionData();
+    }
+    
+    /**
+     * checkAnswer
+     * 
+     * Checks if the user provided answer was correct or not
+     *
+     * @param string $userAnswer
+     * @param string $correctAnswer
+     * @return bool
+     */
+    public function checkAnswer(string $userAnswer, string $correctAnswer): bool
     {
         return $this->answerService->checkAnswer($userAnswer, $correctAnswer);
     }

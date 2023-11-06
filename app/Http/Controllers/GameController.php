@@ -9,6 +9,13 @@ use App\Http\Requests\AnswerValidationRequest;
 /**
  * GameController
  * 
+ * Main Trivia game controller
+ * @author Roberts Ivanovs
+ * 
+ * Handles most of the data needed for the application.
+ * Business logic and most functionality is seperated in Service classes
+ * to imply SOLID code principles and good practices.
+ * 
  */
 class GameController extends Controller
 {    
@@ -18,11 +25,13 @@ class GameController extends Controller
      * @return void
      */
     public function __construct(
-        protected GameService $gameService
+        protected GameService $gameService,
     ) {}
         
     /**
      * startGame
+     * 
+     * Sets the required session variables and starts the game
      *
      * @return void
      */
@@ -34,6 +43,8 @@ class GameController extends Controller
     
     /**
      * fetchQuestion
+     * 
+     * Handles fetching the question data from services and redirects
      *
      * @return void
      */
@@ -42,7 +53,6 @@ class GameController extends Controller
         $questionNumber = $this->gameService->getCurrentQuestionNumber();
         // If session variables are not set
         if ($questionNumber < 1) {
-            // TO DO: add error logging
             return view('index');
         }
 
@@ -59,7 +69,6 @@ class GameController extends Controller
         $questionData = $this->gameService->fetchQuestionData();
 
         if (!$questionData) {
-            // TO DO: add error logging
             return view('index');
         }
 
@@ -71,11 +80,20 @@ class GameController extends Controller
         // Procceed to the game question
         return view('trivia.question', compact('questionData'));
     }
-
+    
+    /**
+     * checkAnswer
+     * 
+     * Handles the user provided answers & redirects.
+     *
+     * @param \App\Http\Requests\AnswerValidationRequest $answerValidationRequest
+     * @return void
+     */
     public function checkAnswer(AnswerValidationRequest $answerValidationRequest)
     {
         // Validate user input
         $validateData = $answerValidationRequest->validated();
+        $questionNumber = $this->gameService->getCurrentQuestionNumber();
 
         // If data was not validated
         if (!$validateData) {
@@ -86,6 +104,13 @@ class GameController extends Controller
         $userAnswer = $validateData['answer'];
         $questionData = $this->gameService->fetchQuestionFromSession();
 
+        // User has answered all questions correctly
+        if ($questionNumber >= config('game.trivia.game_question_count')) {
+            // Delete all session data and return user to Game Win view
+            $this->gameService->deleteSessionData();
+            return view('trivia.gameWin', compact('questionData', 'userAnswer'));
+        }
+
         // Delete the answered question from session
         $this->gameService->deleteQuestionFromSession();
 
@@ -94,6 +119,8 @@ class GameController extends Controller
 
         // If the answer was not correct
         if (!$answerCorrect) {
+            // Delete all session data and redirect user to Game Over view
+            $this->gameService->deleteSessionData();
             return view('trivia.gameOver', compact('questionData', 'userAnswer'));
         }
 

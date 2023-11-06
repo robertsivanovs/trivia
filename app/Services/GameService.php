@@ -49,15 +49,51 @@ class GameService
         return $this->gameSessionService->checkSessionData();
     }
     
-    
     /**
      * fetchQuestionData
      *
-     * @return void
+     * @return array|bool
      */
-    public function fetchQuestionData() //: array|bool
+    public function fetchQuestionData(): \App\Models\Question|bool
     {
         return $this->questionService->fetchQuestionData();
+    }
+    
+    /**
+     * storeQuestionInSession
+     * 
+     * Stores the current question in user session
+     *
+     * @param  mixed $question
+     * @return void
+     */
+    public function storeQuestionInSession(\App\Models\Question $question): void
+    {
+        $this->gameSessionService->storeQuestionInSession($question);
+    }
+    
+    /**
+     * fetchQuestionFromSession
+     * 
+     * Fetches the current question from the session
+     *
+     * @return App\Models\Question|bool
+     */
+    public function fetchQuestionFromSession(): \App\Models\Question|bool
+    {
+        return $this->gameSessionService->fetchQuestionFromSession() ?? false;
+    }
+    
+    /**
+     * deleteQuestionFromSession
+     * 
+     * Deletes the answered question from session
+     *
+     * @return void
+     */
+    public function deleteQuestionFromSession(): void
+    {
+        $this->gameSessionService->deleteQuestionFromSession();
     }
 
 }

@@ -19,8 +19,8 @@ class Question extends Model
      * @return void
      */
     public function __construct(
-        public string $text, 
-        public int    $correctAnswer, 
-        public array  $answers
+        public string       $text, 
+        public int|float    $correctAnswer, 
+        public array        $answers
     ) {}
 }

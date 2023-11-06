@@ -6,6 +6,11 @@ namespace App\Services;
 use Illuminate\Support\Facades\Log;
 use App\Contracts\ValidatorServiceInterface;
 
+/**
+ * ValidatorService
+ * 
+ * Handles API response validation
+ */
 class ValidatorService implements ValidatorServiceInterface
 {
     /**

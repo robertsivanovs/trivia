@@ -3,18 +3,20 @@
 @section('content')
     <h3>Question Nr:. X</h3>
     <h2>{{ $questionData->text }}</h2>
-    <form action="/check-answer" method="post">
+    <form action="/answer" method="post">
         @csrf
-        <input type="hidden" name="correct_answer" value="{{ $questionData->correct_answer }}">
-        <label for="answer">Your Answer:</label>
-        <ul id="answer" name="answer">
+        <label>Your Answer:</label>
+        <ul>
             @foreach($questionData->answers as $answer)
-            <input type="radio" name="answer-option" value="{{ $answer }}">
-            <span>{{ $answer }}</span>
-            <br />
+                <li>
+                    <input type="radio" name="answer" value="{{ $answer }}" required>
+                    <span>{{ $answer }}</span>
+                </li>
             @endforeach
         </ul>
+        @error('answer')
+        <div class="alert alert-danger">{{ $message }}</div>
+        @enderror
         <button type="submit">Submit Answer</button>
     </form>
-
 @endsection

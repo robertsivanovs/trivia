@@ -22,3 +22,6 @@ Route::get('/start', [GameController::class, 'startGame'])->name('trivia.start')
 
 // Handle question fetching
 Route::get('/question', [GameController::class, 'fetchQuestion'])->name('trivia.question');
+
+// Handle user answers
+Route::match(['GET','POST'],'/answer', [GameController::class, 'checkAnswer'])->name('trivia.answer');

@@ -3,10 +3,7 @@
 declare(strict_types=1);
 namespace App\Services;
 
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
 use App\Models\Question;
-
 use App\Contracts\ValidatorServiceInterface;
 use App\Contracts\DataFetcherServiceInterface;
 

@@ -121,9 +121,7 @@ class GameSessionService
     public function incrementCurrentQuestion(): void
     {
         try {
-            $questionCount = $this->request->session()->get('current_question');
-            $questionCount++;
-            $this->request->session()->put('current_question', $questionCount);
+            $this->request->session()->increment('current_question');
         } catch (\Exception $e) {
             Log::error('Error in incrementCurrentQuestion: ' . $e->getMessage());
         }

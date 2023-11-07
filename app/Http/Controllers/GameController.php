@@ -33,12 +33,13 @@ class GameController extends Controller
     /**
      * startGame
      * 
-     * Sets the required session variables and starts the game
+     * Deletes the previous session & Starts a new game.
      *
      * @return void
      */
     public function startGame()
     {
+        $this->gameService->deleteSessionData();
         $this->gameService->startGame();
         return view('trivia.start');
     }

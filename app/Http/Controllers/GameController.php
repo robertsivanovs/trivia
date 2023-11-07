@@ -80,7 +80,8 @@ class GameController extends Controller
         $this->gameService->storeQuestionInSession($questionData);
 
         // Procceed to the game question
-        return view('trivia.question', compact('questionData'));
+        return redirect()->route('trivia.question')->with('questionData', $questionData);
+
     }
     
     /**

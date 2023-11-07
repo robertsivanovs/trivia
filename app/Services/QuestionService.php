@@ -6,6 +6,7 @@ namespace App\Services;
 use App\Models\Question;
 use App\Contracts\ValidatorServiceInterface;
 use App\Contracts\DataFetcherServiceInterface;
+use Illuminate\Support\Facades\Log;
 
 /**
  * QuestionService
@@ -28,34 +29,36 @@ class QuestionService
      */
     public function fetchQuestionData(): Question|bool
     {
-        // Fetch the data from numbersapi
-        $response = $this->dataFetcherServiceInterface->fetchApiData();
+        try {
+            // Fetch the data from numbersapi
+            $response = $this->dataFetcherServiceInterface->fetchApiData();
 
-        if (!$response) {
+            if (!$response) {
+                Log::error('Failed to fetch question data: No response');
+                return false;
+            }
+
+            // Validate the response
+            if (!$this->validatorServiceInterface->validate($response)) {
+                Log::error('Failed to fetch question data: Invalid response');
+                return false;
+            }
+
+            $questionData = $response->json();
+
+            // Extract the text, number, and answer options
+            $text = $questionData['text'];
+            $correctAnswer = (string)$questionData['number'];
+
+            // Generate the answers for the question
+            $answers = $this->generateRandomAnswers($correctAnswer);
+
+            // Return the question data
+            return new Question($text, $correctAnswer, $answers);
+        } catch (\Exception $e) {
+            Log::error('Error in fetchQuestionData: ' . $e->getMessage());
             return false;
         }
-
-        // Instantiate the validator class
-        if (!$this->validatorServiceInterface->validate($response)) {
-            return false;
-        }
-
-        $questionData = $response->json();
-
-        // Extract the text, number, and answer options
-        $text = $questionData['text'];
-        $correctAnswer = (string)$questionData['number'];
-
-        // Generate the answers for the question
-        $answers = $this->generateRandomAnswers($correctAnswer);
-
-        // Return the question data
-        return new Question(
-            $text, 
-            $correctAnswer, 
-            $answers
-        );
-
     }
     
     /**

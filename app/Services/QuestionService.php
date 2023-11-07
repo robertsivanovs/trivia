@@ -14,7 +14,12 @@ use Illuminate\Support\Facades\Log;
  * Handles the logic for fetching and validating the question API data
  */
 class QuestionService
-{
+{    
+    /**
+     * __construct
+     *
+     * @return void
+     */
     public function __construct(
         protected ValidatorServiceInterface $validatorServiceInterface,
         protected DataFetcherServiceInterface $dataFetcherServiceInterface
@@ -67,7 +72,7 @@ class QuestionService
      * Generates a random amount if addiitonal answers for the game
      * 1-3 additional answers
      *
-     * @param int|float $correctAnswer
+     * @param  string $correctAnswer
      * @return array
      */
     private function generateRandomAnswers(string $correctAnswer): array

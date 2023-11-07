@@ -25,7 +25,7 @@ class GameController extends Controller
      * @return void
      */
     public function __construct(
-        protected GameService $gameService,
+        protected GameService $gameService
     ) {}
         
     /**

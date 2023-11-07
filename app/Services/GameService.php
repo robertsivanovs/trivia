@@ -20,6 +20,8 @@ class GameService
 {    
     /**
      * __construct
+     * 
+     * PHP 8+: Constructor property promotion
      *
      * @return void
      */
@@ -48,7 +50,7 @@ class GameService
      * 
      * Returns the current question count
      *
-     * @return bool
+     * @return int
      */
     public function getCurrentQuestionNumber(): int
     {
@@ -73,11 +75,25 @@ class GameService
      * 
      * Return the data needed for displaying the question
      *
-     * @return array|bool
+     * @return \App\Models\Question|bool
      */
     public function fetchQuestionData(): \App\Models\Question|bool
-    {
-        return $this->questionService->fetchQuestionData();
+    {        
+        do {
+            // Fetch a new question
+            $questionData = $this->questionService->fetchQuestionData();
+
+            if (!$questionData) {
+                return false;
+            }
+
+            // Check if this question has already been asked in the current session
+        } while ($this->gameSessionService->isQuestionAlreadyAsked($questionData->text));
+
+        // If the question is not a repeat, store it in the session
+        $this->gameSessionService->storeQuestionInSession($questionData);
+
+        return $questionData;
     }
     
     /**
@@ -85,7 +101,7 @@ class GameService
      * 
      * Stores the current question in user session
      *
-     * @param  mixed $question
+     * @param \App\Models\Question $question
      * @return void
      */
     public function storeQuestionInSession(\App\Models\Question $question): void
@@ -103,6 +119,19 @@ class GameService
     public function fetchQuestionFromSession(): \App\Models\Question|bool
     {
         return $this->gameSessionService->fetchQuestionFromSession() ?? false;
+    }
+        
+    /**
+     * isQuestionAlreadyAsked
+     * 
+     * Check if the fetched question has already been asked during this game
+     *
+     * @param  string $questionText
+     * @return bool
+     */
+    public function isQuestionAlreadyAsked(string $questionText): bool
+    {
+        return $this->gameSessionService->isQuestionAlreadyAsked($questionText);
     }
     
     /**

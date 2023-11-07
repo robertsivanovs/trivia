@@ -32,6 +32,8 @@ class GameSessionService
     public function startGame()
     {
         $this->request->session()->put('current_question', 1);
+        $this->request->session()->put('asked_questions', []);
+
         // Regenerate session ID for additional security
         $this->request->session()->regenerate();
     }
@@ -59,6 +61,8 @@ class GameSessionService
     public function storeQuestionInSession(\App\Models\Question $question): void
     {
         $this->request->session()->put('question_data', $question);
+        $this->request->session()->push('asked_questions', $question->text);
+
         // Regenerate session ID for additional security
         $this->request->session()->regenerate();
     }
@@ -78,6 +82,20 @@ class GameSessionService
             Log::error('Error in fetchQuestionFromSession: ' . $e->getMessage());
             return null;
         }
+    }
+        
+    /**
+     * isQuestionAlreadyAsked
+     * 
+     * Checks if the question has already been asked during this game session
+     *
+     * @param  string $questionText
+     * @return bool
+     */
+    public function isQuestionAlreadyAsked(string $questionText): bool
+    {
+        $askedQuestions = $this->request->session()->get('asked_questions');
+        return in_array($questionText, $askedQuestions);
     }
     
     /**

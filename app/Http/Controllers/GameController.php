@@ -21,6 +21,8 @@ class GameController extends Controller
 {    
     /**
      * __construct
+     * 
+     * PHP 8+: Constructor property promotion
      *
      * @return void
      */
@@ -56,7 +58,7 @@ class GameController extends Controller
             return view('index');
         }
 
-        // Check if the current question is in the session
+        // Check if there is a question already in the current session
         $questionData = $this->gameService->fetchQuestionFromSession();
 
         // Do not fetch a new question untill the current one is answered

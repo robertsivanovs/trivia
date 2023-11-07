@@ -19,7 +19,7 @@ class GameSessionService
      * @return void
      */
     public function __construct(
-        protected Request $request
+        protected Request $request,
     ) {}
 
     /**
@@ -32,6 +32,8 @@ class GameSessionService
     public function startGame()
     {
         $this->request->session()->put('current_question', 1);
+        // Regenerate session ID for additional security
+        $this->request->session()->regenerate();
     }
     
     /**
@@ -57,6 +59,8 @@ class GameSessionService
     public function storeQuestionInSession(\App\Models\Question $question): void
     {
         $this->request->session()->put('question_data', $question);
+        // Regenerate session ID for additional security
+        $this->request->session()->regenerate();
     }
     
     /**

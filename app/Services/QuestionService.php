@@ -47,7 +47,7 @@ class QuestionService
             $questionData = $response->json();
 
             // Extract the text, number, and answer options
-            $text = $questionData['text'];
+            $text = $this->processQuestionText($questionData['text']);
             $correctAnswer = (string)$questionData['number'];
 
             // Generate the answers for the question
@@ -86,4 +86,35 @@ class QuestionService
 
         return $answerOptions;
     }
+    
+    /**
+     * processQuestionText
+     * 
+     * Removes the correct answer and the word "is" from 
+     * the beginning of the question text that's received from the API
+     * 
+     * Example (0 is the coldest possible temperature old the Kelvin scale.)
+     *
+     * @param  string $rawText
+     * @return string
+     */
+    private function processQuestionText(string $rawText): string
+    {
+        // Split the text into words
+        $words = explode(' ', $rawText);
+
+        // Find the position of "is" in the words array
+        $isPosition = array_search('is', $words);
+
+        if ($isPosition !== false && $isPosition > 0) {
+            // Remove everything before "is" (including "is")
+            $processedText = implode(' ', array_slice($words, $isPosition + 1));
+        } else {
+            // If "is" is not found or at the beginning, keep the original text
+            $processedText = $rawText;
+        }
+
+        return $processedText;
+    }
+
 }

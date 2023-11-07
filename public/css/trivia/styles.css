@@ -1,0 +1,38 @@
+/* 
+* Trivia game styles styles.css 
+*/
+
+/* Apply styles to the body element */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+    color: #333;
+}
+
+/* Apply styles to headings (h1, h2, etc.) */
+h1, h2, h3 {
+    color: #007BFF;
+}
+
+/* Apply styles to the trivia game questions, answers */
+.trivia-container, 
+.answer-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+        button {
+            background-color: #007BFF;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+        }
+        ul {
+            list-style: none;
+            li {
+                text-align: left;
+            }
+        }
+    }
+}
